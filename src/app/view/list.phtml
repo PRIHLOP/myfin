@@ -1,0 +1,257 @@
+<?php
+/*
+* В этот скрипт передаются следующие переменные:
+*
+* $cloud_tags[]
+* $money_in_type_link
+* $money_out_type_link
+* $date_links[]
+* $date_start
+* $date_end
+* $date_links[]
+* $hidden_inputs[]
+* $select[]
+* $events_list[]
+* $total_in
+* $total_out
+* $total
+* ~$no_limit_link
+* ~$found_rows
+* $new_button_link
+* $SubTotal_Daily_link
+* $SubTotal_Weekly_link
+* $SubTotal_Monthly_link
+* $SubTotal_Yearly_link
+*/
+?>
+<script type="text/javascript">
+var myfin_global_tag_list = <?php echo $tag_list?>;
+</script>
+<script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="js/jquery-plugins.js"></script>
+<script type="text/javascript" src="js/all_custom.js"></script>
+
+<div id="side_bar">
+
+<div class="select_param_div" id="sp_type">
+<h3>Тип</h3>
+<div class="to_hide">
+<ul>
+<li><a href="<?php echo $money_in_type_link ?>" class="money_in">прибыль</a></li>
+<li><a href="<?php echo $money_out_type_link ?>" class="money_out">расход</a></li>
+</ul>
+</div>
+</div>
+
+<div class="select_param_div" id="sp_period">
+<h3>Период</h3>
+<div class="to_hide">
+<ul>
+<?php foreach ($date_links as $date_link) : ?>
+<li><a href="<?php echo $date_link['link'] ?>"><?php echo $date_link['name'] ?></a></li>
+<?php endforeach; ?>
+</ul>
+
+<sub>за последние</sub><br>
+<?php foreach ($date_links_d as $date_link) : ?>
+<a href="<?php echo $date_link['link'] ?>"><?php echo $date_link['name'] ?></a>
+<?php endforeach; ?>
+<br><sup>дней</sup>
+
+<form action="" method="GET">
+<span class="s_po">с</span>
+<div class="cal_wrap">
+<input id="date_input1" class="date_input" name="date_start" type="text" value="<?php echo $date_start ?>">
+<div id="toggle_cal1" class="toggle_cal"></div>
+<div id="calendar1" class="calendar"></div>
+</div>
+<br>
+<span class="s_po">по</span>
+<div class="cal_wrap">
+<input id="date_input2" class="date_input" name="date_end" type="text" value="<?php echo $date_end ?>">
+<div id="toggle_cal2" class="toggle_cal"></div>
+<div id="calendar2" class="calendar"></div>
+</div>
+<br>
+<input type="submit" value="задать">
+<?php foreach ($hidden_inputs as $k => $v) : ?>
+<input name="<?php echo $k ?>" type="hidden" value="<?php echo $v ?>">
+<?php endforeach; ?>
+</form>
+</div>
+</div>
+
+<div class="select_param_div" id="sp_search">
+
+<h3>Поиск</h3>
+<div class="to_hide">
+<form action="" method="GET">
+<div class="sp_wrap">
+<input class="sp_input" type="text" name="search" value="<?php echo $search_str ?>">
+<input class="sp_submit_button" type="image" src="design/images/search.png" title="поиск" class="submit_button">
+</div>
+<?php foreach ($hidden_inputs4search as $k => $v) : ?>
+<input name="<?php echo $k ?>" type="hidden" value="<?php echo $v ?>">
+<?php endforeach; ?>
+</form>
+</div>
+</div>
+
+
+<div class="select_param_div" id="sp_tag">
+<h3>Теги</h3>
+<div class="to_hide">
+<ul class="tags_ul">
+<?php foreach ($cloud_tags as $tag): ?>
+<li><a style="background-color: <?php echo $tag['color'] ?>;" href="<?php echo $tag['link'] ?>">
+<?php echo $tag['name'] ?></a> <?php echo $tag['count'] ?></li>
+<?php endforeach; ?>
+</ul>
+</div>
+</div>
+
+
+<div class="select_param_div" id="sp_type">
+<h3>ПодИтог</h3>
+<div class="to_hide">
+<ul>
+<li><a href="<?php echo $SubTotal_Daily_link ?>">дневной</a></li>
+<li><a href="<?php echo $SubTotal_Weekly_link ?>">недельный</a></li>
+<li><a href="<?php echo $SubTotal_Monthly_link ?>">месячный</a></li>
+<li><a href="<?php echo $SubTotal_Yearly_link ?>">годовой</a></li>
+</ul>
+</div>
+</div>
+
+
+
+</div><!-- / #side_bar -->
+
+
+<div id="content">
+
+<!-- параметры запроса -->
+<?php if (count($select) > 0) : ?>
+<div class="select">
+<?php foreach ($select as $value) : ?>
+<?php echo $value['text']; ?> <?php if ($value['link_inversion']) { echo "<a href='".$value['link_inversion']."'>[+/-]</a>"; } ?><?php if ($value['link_only_inversion']) { echo "<a href='".$value['link_only_inversion']."'>[со списком/без]</a>"; } ?><a href="<?php echo $value['link'] ?>">[x]</a><br>
+<?php endforeach; ?>
+</div>
+<?php endif; ?>
+
+<!-- основная таблица (с событиями) -->
+<table class="events_list">
+<tr><td colspan="4" id="new_item_row">Новая запись</td></tr>
+<tr class="form_container_tr">
+<td colspan="4" class="td4_item_form" id="td4new_item_form"></td>
+</tr>
+
+<?php foreach ($events_list as $e) : ?>
+<?php if (array_key_exists($e['id'], $events_list_st)) { ?>
+<?php if (array_key_exists('subtotal_len', $events_list_st[$e['id']])) { ?>
+<tr>
+<td class="description" colspan="3">
+<B><U>ПодИтог: <?php echo Util::formatMoneyValue($events_list_st[$e['id']]['subtotal_in'] / 100, false, false); ?>  - <?php echo Util::formatMoneyValue(0 - $events_list_st[$e['id']]['subtotal_out'] / 100, false, false); ?> &nbsp;= <?php echo Util::formatMoneyValue(($events_list_st[$e['id']]['subtotal_in'] - $events_list_st[$e['id']]['subtotal_out']) / 100); ?></U></B><?php if ($events_list_st[$e['id']]['subtotal_len'] > 1) { echo "&nbsp;(".Util::formatMoneyValue(($events_list_st[$e['id']]['subtotal_in'] - $events_list_st[$e['id']]['subtotal_out']) / 100 / $events_list_st[$e['id']]['subtotal_len'])." в день)"; } ?>
+</td>
+<td class="date" title="<?php echo Util::readlyTime($events_list_st[$e['id']]['date'], true) ?>">
+<?php echo Util::readlyTime($events_list_st[$e['id']]['date'], false, get_config('noYear')) ?>
+</td>
+</tr>
+<tr class="form_container_tr"><td colspan="4"></td>
+</tr>
+<?php } /* if (array_key_exists('subtotal_lenin', $events_list_st[$e['id']]) { */ ?>
+<?php if (array_key_exists('st_only', $events_list_st[$e['id']]) &&
+    $events_list_st[$e['id']]['st_only'] == true) continue; ?>
+<?php } /* if (array_key_exists($e['id'], $events_list_st)) */ ?>
+<tr id="event_tr_<?php echo $e['id'] ?>">
+<td class="description">
+<a class="<?php echo $e['type_str'] ?>"
+href="nojs.html" title="правка" id="descr_text_<?php echo $e['id'] ?>"
+onclick="return csf(<?php echo $e['form_params_str'] ?>);">
+<?php echo $e['description'] ?>
+</a>
+<span class="tags_list">
+<?php foreach ($e['tag_list'] as $tag) : ?>
+<span><a style="background-color: <?php echo $tag['color'] ?>;"
+         href="<?php echo $tag['link'] ?>"><?php echo $tag['name'] ?></a><a
+onclick="return confirm('Удалить тег?');" class="r_tag" title="удалить тег"
+href="<?php echo $tag['remove_link'] ?>">x</a></span>
+
+<?php endforeach; ?>
+</span>
+</td>
+<td class="buttons">
+<a class="button edit" id="edit_button_<?php echo $e['id'] ?>"
+   onclick="return csf(<?php echo $e['form_params_str'] ?>);"
+   href="nojs.html" title="правка"></a>
+<a class="button remove"
+href="<?php echo $e['remove_link'] ?>"
+onclick="return confirm('Удалить запись?');" title="удалить"></a>
+</td>
+<td class='value <?php echo $e['type_str'] ?>'>
+<?php echo $e['value_str']; ?>
+</td>
+<td class="date" title="<?php echo Util::readlyTime($e['date'], true) ?>">
+<?php echo Util::readlyTime($e['date'], false, get_config('noYear')) ?>
+</td>
+</tr>
+<tr class="form_container_tr"><td colspan="4" id="td4_item_form_<?php echo $e['id'] ?>"></td>
+</tr>
+<?php endforeach; ?>
+
+</table>
+
+<hr>Итого: <?php echo $total_in ?>  - <?php echo $total_out ?> &nbsp;= <?php echo $total ?>
+
+<!-- ссылка "показать всё", если нужна -->
+<?php if (isset($no_limit_link)): ?>
+<center>показаны первые <?php echo get_config('items_on_page') ?><br>
+<a href="<?php echo $no_limit_link ?>">показать все (<?php echo $found_rows ?>)</a></center>
+<?php endif; ?>
+
+</div><!-- / #content -->
+
+<script type="text/javascript">
+new function() {
+
+// Подключение календарей к полям выборки по дате
+new Kalender('date_input1', 'calendar1', 'toggle_cal1', true);
+new Kalender('date_input2', 'calendar2', 'toggle_cal2');
+
+// Подключение формы к кнопке Новая запись
+var event_tr = document.getElementById('new_item_row');
+var event_tr_dispaly_def = event_tr.style.display;
+
+var form = null;
+
+var onclick_hadler = function(){
+form.toggle();
+event_tr.style.display = (event_tr.style.display == event_tr_dispaly_def) ?
+'none' : event_tr_dispaly_def;
+return false;
+};
+
+event_tr.onclick = onclick_hadler;
+
+form = new myfinEditForm({
+parent: 'td4new_item_form',
+tag_list: myfin_global_tag_list,
+action: '<?php echo $new_button_link ?>',
+cancel_handler: onclick_hadler
+});
+
+// Делание критериев сворачиваемыми
+var spd = $('.select_param_div');
+for (var i = 0; i < spd.length; i++) {
+    if ($.cookie('exp_' + spd[i].id) == 1)
+        $(spd[i]).addClass('expanded');
+}
+
+$('.select_param_div h3').bind('click', function() {
+    var parent = $(this.parentNode);
+    parent.toggleClass('expanded');
+    $.cookie('exp_' + parent.attr('id'), parent.hasClass('expanded') ? '1' : null, { expires: 7 });
+})
+
+}();
+</script>

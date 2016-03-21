@@ -1,0 +1,103 @@
+<h1><?php echo ($form_data['id'] == 0) ? 'Новая запись' : 'Правка' ?></h1>
+
+<form action="" method="POST">
+
+    <div class="input_block">
+        <label>Описание<br>
+            <input name="description" id="description_input" class="description_input"
+                   type="text" value="<?php echo $form_data['description'] ?>">
+        </label>
+        <div class="note">любой текст, не более 300 символов</div>
+    </div>
+
+    <div class="input_block">
+        <label>Теги<br>
+            <input name="tags" id="tags_input" type="text" class="tags_input"
+                   value="<?php echo $form_data['tags'] ?>">
+        </label>
+        <div class="note">через запятую, пример: <i>зарплата, основная работа, на карточку</i></div>
+        <div id="tag_list" class="tag_list_on_edit_page"></div>
+    </div>
+
+    <div class="input_block">
+        <label>Сумма<br>
+            <input name="value" type="text" id="value_input" class="value_input"
+                   value="<?php echo $form_data['value'] ?>"></label>
+        <label><input name="type" type="radio" value="1" <?php echo $form_data['type'] ? 'checked' : '' ?>>
+            <span class="money_in">прибыль</span></label>
+        <label><input name="type" type="radio" value="0" <?php echo!$form_data['type'] ? 'checked' : '' ?>>
+            <span class="money_out">расход</span></label>
+        <div class="note">примеры: <i>100.42, 100,42, 5100, 5 100, 9 999.99</i></div>
+    </div>
+
+    <div class="input_block">
+        <label for="date_input">Дата</label><br>
+        <div class="cal_wrap">
+            <input id="date_input" class="date_input" name="date" type="text" value="<?php echo $form_data['date'] ?>">
+            <div id="toggle_cal" class="toggle_cal"></div>
+            <div id="calendar" class="calendar"></div>
+        </div>
+    </div>
+
+    <div class="input_block">
+        <input type="submit" value="Сохранить">
+    </div>
+
+    <input type="hidden" name="id" value="<?php echo $form_data['id'] ?>">
+</form>
+
+
+<script type="text/javascript" src="js/all_custom.js"></script>
+<script type="text/javascript">
+    new function() {
+
+        /* Список тегов для удобного добавления
+         */
+        var tag_list = <?php echo $tag_list; ?>;
+
+        var tag_list_div = document.getElementById('tag_list');
+        var tags_input = document.getElementById('tags_input');
+
+        var add_tag = function() {
+            tags_input.value = myfin_utis.add_or_remove_tag(tags_input.value, this.innerHTML);
+        };
+
+        for (i = 0; i < tag_list.length; i++) {
+            var newSpan = document.createElement('span');
+            newSpan.innerHTML = tag_list[i].name;
+            newSpan.onclick = add_tag;
+            newSpan.style.backgroundColor = tag_list[i].color;
+
+            tag_list_div.appendChild(newSpan);
+            tag_list_div.appendChild(document.createTextNode(" "));
+        }
+
+        /* Обработчики для "описания" и "суммы"
+         */
+        var descr = document.getElementById('description_input');
+        descr.onfocus = function() {
+            if(this.value=='нет описания ...')
+                this.value='';
+        };
+        descr.onblur = function() {
+            if(this.value=='')
+                this.value='нет описания ...';
+        };
+
+        var value_input = document.getElementById('value_input');
+        value_input.onfocus = function() {
+            if(this.value=='0')
+                this.value='';
+        };
+    value_input.onblur = function() {
+        if(this.value=='')
+            this.value='0';
+    }
+// TODO автоматический выбор radio при вводе отрицательной суммы + цветом раскрашивать
+
+
+/* Подключение календарика
+ */
+new Kalender('date_input', 'calendar', 'toggle_cal');
+}();
+</script>

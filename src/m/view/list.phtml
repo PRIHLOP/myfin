@@ -1,0 +1,36 @@
+<table>
+    <tr>
+        <td><a class="button_link" href="edit.php">Добавить</a></td>
+        <td align="right"><?php echo Util::formatMoneyValue(Events::getCurentBalance()) ?></td>
+    </tr>
+</table>
+
+<table class="events_tbl">
+
+<?php foreach ($last_events as $e):
+    $odd = (@$odd == 'odd') ? '' : 'odd';
+    $type_cls = ($e['type'] == 0) ? 'money_out' : 'money_in';
+    ?>
+
+    <tr class="tr1 <?php echo $odd?>">
+        <td class="td_dscr" valign="top">
+        <a href="edit.php?id=<?php echo $e['id']?>" class="<?php echo $type_cls?>">
+        <?php echo $e['description']?>
+        </a>
+        </td>
+        <td class="td_value" valign="top"><?php echo $e['value_str']?></td>
+        <td rowspan="2" class="td_remove" valign="middle">
+            <a href="remove.php?id=<?php echo $e['id']?>"
+               onclick="return confirm('Удалить запись?');">
+                <img src="../design/images/delete.png" alt="x">
+            </a>
+        </td>
+    </tr>
+    <tr class="tr2 <?php echo $odd?>">
+        <td class="td_tags" valign="top"><?php echo $e['tags']?></td>
+        <td class="td_date" valign="top"><?php echo $e['date_str']?></td>
+    </tr>
+
+<?php endforeach; ?>
+
+</table>

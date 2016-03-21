@@ -1,0 +1,83 @@
+<form action="" method="POST">
+    <label>Описание:<br/>
+        <input class="txt_input" type="text" name="description"
+               value="<?php echo $form_data['description'] ?>"></label>
+    <div class="between_br"></div>
+    <label for="tags_input">Теги:</label>
+    <table>
+        <tr>
+            <td><input id="tags_input" class="txt_input" type="text" name="tags"
+                       value="<?php echo $form_data['tags'] ?>"></td>
+            <td width="1"><select id="tag_list">
+                    <option>-- добавить тег --</option>
+                </select></td>
+        </tr>
+    </table>
+    <div class="between_br"></div>
+    <label for="value_input0">Сумма:</label>
+    <label><input type="radio" name="type" value="1"
+                  <?php echo $form_data['type'] ? 'checked' : '' ?>>прибыль</label>
+    <label><input type="radio" name="type" value="0"
+                  <?php echo!$form_data['type'] ? 'checked' : '' ?>>расход</label><br>
+    <input id="value_input0" class="txt_input" type="text" name="value"
+           value="<?php echo $form_data['value'] ?>">
+    <div class="between_br"></div>
+    <label>Дата:<br/>
+        <input class="txt_input" type="text" name="date"
+               value="<?php echo $form_data['date'] ?>"></label>
+    <div class="between_br"></div>
+    <input class="btn_input" type="submit" value="сохранить">
+    <input type="hidden" name="id" value="<?php echo $form_data['id'] ?>">
+</form>
+<script type="text/javascript">
+    var myfin_utis = {
+        add_or_remove_tag: function(selected_tags, tag_to_add) {
+            selected_tags = selected_tags.replace(/(^\s+)|(\s+$)/g, ""); // trim
+            if (selected_tags == '')
+                return tag_to_add;
+            else {
+                selected_tags = selected_tags.split( /\s*,\s*/ );
+                var new_selected_tags = [];
+                var found = false;
+                var i = 0;
+                var j = 0;
+                for (; i < selected_tags.length; i++) {
+                    if (selected_tags[i] == tag_to_add)
+                        found = true;
+                    else
+                        new_selected_tags[j++] = selected_tags[i];
+                }
+                if (!found)
+                    new_selected_tags[j] = tag_to_add;
+
+                new_selected_tags = new_selected_tags.join(', ');
+                return new_selected_tags;
+            }
+        }
+    };
+
+    new function() {
+        /* Список тегов для удобного добавления
+         */
+        var tag_list = <?php echo $tag_list; ?>;
+
+        var tag_list_select = document.getElementById('tag_list');
+        var tags_input = document.getElementById('tags_input');
+
+        tag_list_select.onchange = function() {
+            if (this.selectedIndex != 0) {
+                tags_input.value = myfin_utis.add_or_remove_tag(tags_input.value,
+                this.options[this.selectedIndex].innerHTML);
+                this.selectedIndex = 0;
+            }
+        };
+
+        for (i = 0; i < tag_list.length; i++) {
+            var newOption = document.createElement('option');
+            newOption.innerHTML = tag_list[i].name;
+            newOption.style.color = tag_list[i].color;
+
+            tag_list_select.appendChild(newOption);
+        }
+    }();
+</script>

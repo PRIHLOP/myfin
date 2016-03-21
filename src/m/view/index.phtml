@@ -1,0 +1,25 @@
+<style>
+#curent_balance {
+    font-weight: bold;
+}
+.button_link {
+    padding: 5px;
+    background: #ddd;
+    display: block;
+    margin: 5px 0;
+    text-decoration: none;
+    color: #000;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+</style>
+<div style="text-align: center;">
+<?php echo Util::formatMoneyValue(Events::getCurentBalance()) ?>
+    
+    <a class="button_link" href="edit.php">Добавить</a>
+    <a class="button_link" href="list.php">Последние</a>
+
+<div id="curent_balance">
+
+</div>
+</div>

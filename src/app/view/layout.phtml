@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            <?php echo self::get_title() ?>
+        </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="design/style.css" />
+        <link rel="shortcut icon" href="design/images/favicon.png" />
+    </head>
+    <body>
+        <div id="wrap">
+
+<?php while (Messages::hasMessages()): ?>
+    <div class="message"><?php echo Messages::popMessage(); ?></div>
+<?php endwhile; ?>
+<?php while (Messages::hasWarnings()): ?>
+    <div class="message warning"><?php echo Messages::popWarning(); ?></div>
+<?php endwhile; ?>
+<?php while (Messages::hasErrors()): ?>
+     <div class="message error"><?php echo Messages::popError(); ?></div>
+<?php endwhile; ?>
+
+            <a href="<?php echo Util::getBaseUrl() ?>" id="site_logo"></a>
+
+            <?php  if (get_config('use_openid') && User::getUser() !== null): ?>
+            <div id="userbar">
+                <?php echo User::getName() ?>,
+                <a href="logout.php">выйти</a>
+            </div>
+            <?php endif; ?>
+
+            <?php  if (!get_config('use_openid') || User::getUser() !== null):
+                $balance = Events::getCurentBalance(); ?>
+            <div id="curent_balance" title="<?php echo number_format($balance[1], 2, ',', ' ') .
+                    ' - ' . number_format($balance[2], 2, ',', ' ') ?>">
+                <small>сейчас у вас</small>
+                <?php echo Util::formatMoneyValue($balance[0]) ?>
+            </div>
+            <?php endif; ?>
+
+            <div class="clear"></div>
+
+            <div id="wrap2">
+            <?php echo $content ?>
+            </div>
+
+            <div class="clear"></div>
+            <div id="footer"><a href="https://bitbucket.org/Pozadi/myfin">myfin</a>
+            <?php echo VERSION?> / <a href="m/">мобильная версия</a> / <a href="export.php">экспорт и импорт</a></div>
+        </div>
+    </body>
+</html>
+<!--
+
+Time: <?php echo number_format(Util::whatTimer(), 10)?> seconds
+Db time: <?php echo number_format(Db::getFullQueryTime(), 10)?> seconds
+Memory: <?php echo memory_get_peak_usage() ?> bytes
+
+
+<?php if(get_config('debug')): while (Messages::hasDebug()): ?>
+     <?php echo Messages::popDebug(); ?>
+
+
+<?php endwhile; endif;?>
+
+-->
